@@ -54,7 +54,11 @@ def movie_lookup():
 	with open('input.csv', encoding='utf-8-sig') as csvfile:
 		inputreader = csv.reader(csvfile)
 		for row in inputreader:
-			rawmovie = str(row)
+			#print(row)
+			rawmovie = str(row[0])
+			avail_date = str(row[1])
+			#print(avail_date)
+			print(rawmovie)
 			try:
 				year = int(rawmovie[rawmovie.find("(")+1:rawmovie.find(")")])
 			except ValueError:
@@ -65,12 +69,28 @@ def movie_lookup():
 			movie_plus = add_plus(movie_plus)
 			movie_info = info_grabber(movie_plus, year)
 			if movie_info == None:
-				print('could not find info, next movie!')
+				print('could not find info on' + rawmovie + ', next movie!')
+				print_table_nolink(avail_date, rawmovie)
 				continue
+			print_table(avail_date, movie_info)
 			with open('output.csv', 'a') as output:
 				w = csv.DictWriter(output, movie_info.keys())
 				w.writerow(movie_info)
-			print(movie_plus)
+			#print(movie_plus)
+
+def print_table(avail_date, movie_info):
+	file_date = avail_date.replace("/", "-")
+	file_name = file_date + ".txt"
+	imdbhyperlink = movie_info.get('hyperlink')
+	title = movie_info.get('Title')
+	with open(file_name, 'a') as output:
+		output.write('<li><i>%s</i></li>\n' % (imdbhyperlink))
+
+def print_table_nolink(avail_date,rawmovie):
+	file_date = avail_date.replace("/", "-")
+	file_name = file_date + ".txt"
+	with open(file_name, 'a') as output:
+		output.write('<li><i>%s</i></li>\n' % (rawmovie))
 
 #def imdb_request(s)
 movie_lookup()
